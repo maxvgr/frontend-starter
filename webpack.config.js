@@ -43,15 +43,6 @@ const pages = fs
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
-  // let buildDateValue = null;
-  // try {
-  //   buildDateValue = execSync(
-  //     'git log -1 --format=%cd --date=format:%d.%m.%Y',
-  //     { encoding: 'utf8' },
-  //   ).trim();
-  // } catch (error) {
-  //   buildDateValue = 'Не указано';
-  // }
   const buildDateValue = new Intl.DateTimeFormat('ru-RU').format(new Date());
 
   return {

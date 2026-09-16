@@ -3,6 +3,7 @@
 // import ScrollTop from '../utils/scroll-top';
 // import Gallery from '../component/gallery';
 // import Tab from '../component/tabs';
+// import CookieNote from '../component/cookie-note';
 
 import LazyLoad from 'vanilla-lazyload';
 import Modal from '../component/modal';
@@ -23,7 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     callback_loaded: (trigger) => {
       const container = trigger.closest('.lazy');
-      container.classList.remove('lazy--preloader');
+
+      if (container) {
+        container.classList.remove('lazy--preloader');
+      }
     },
   });
 
@@ -46,27 +50,40 @@ document.addEventListener('DOMContentLoaded', () => {
     openSelector: 'data-modal-open',
     closeSelector: 'data-modal-close',
 
-    onShow: (modal) => { },
-    onClose: (modal) => { },
-    onCloseAll: () => { }
+    onShow: () => {},
+    onClose: () => {},
+    onCloseAll: () => {},
   });
 
   window.App.submenu = new Submenu({
     single: false,
-    duration: 300
+    duration: 300,
   });
 
   window.App.accordion = new Accordion({
     single: false,
-    duration: 600
+    duration: 600,
   });
 
   window.App.form = new Form();
+
+  window.addEventListener('formSuccess', (event) => {
+    const form = event.detail?.form;
+    const successModal =
+      event.detail?.successModal || form?.dataset.successModal;
+
+    if (!successModal || !window.App.modal) return;
+
+    window.App.modal.close();
+    window.App.modal.open(successModal);
+  });
+
   window.App.numberInput = new NumberInput();
 
   // window.App.gallery = new Gallery();
   // window.App.tab = new Tab();
   // window.App.scrollTop = new ScrollTop();
+  // window.App.cookieNote = new CookieNote();
 
   PlayVideoInViewport();
 });

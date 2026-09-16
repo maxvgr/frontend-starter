@@ -13,21 +13,26 @@ const phoneMasks = new WeakMap();
  * Инициализирует маску для конкретного поля телефона
  */
 export function initPhoneMask(phoneInput, countryCode = '7') {
-  if (!phoneInput || phoneMasks.has(phoneInput)) return phoneMasks.get(phoneInput);
+  if (!phoneInput || phoneMasks.has(phoneInput)) {
+    return phoneMasks.get(phoneInput);
+  }
 
   const maskController = IMask(phoneInput, {
     mask: PHONE_MASKS[countryCode] || PHONE_MASKS[7],
 
     dispatch: (appended, dynamicMasked) => {
       const number = (dynamicMasked.value + appended).replaceAll(/\D/g, '');
+
       if (number.startsWith('8') && number.length === 1) {
         dynamicMasked.value = '+7';
       }
+
       return dynamicMasked;
     },
   });
 
   phoneMasks.set(phoneInput, maskController);
+
   return maskController;
 }
 
@@ -39,12 +44,15 @@ export function updatePhoneMask(phoneInput, countryCode) {
 
   if (!maskController) {
     console.warn('Маска для поля телефона не найдена');
+
     return;
   }
 
   const maskPattern = PHONE_MASKS[countryCode];
+
   if (!maskPattern) {
     console.warn(`Для кода страны не определена маска телефона: ${countryCode}`);
+
     return;
   }
 
@@ -64,10 +72,14 @@ export function updatePhoneMask(phoneInput, countryCode) {
  * @property {HTMLElement[]} privacy
  * @property {HTMLSelectElement} [country]
  * @property {Object} [nameMask]
+ * @property {boolean} validation
+ * @property {HTMLElement[]} validationFields
+ * @property {boolean} validationAttempted
  * @property {Function} onSubmit
  * @property {Function} onClick
  * @property {Function} onPrivacyChange
  * @property {Function} onCountryChange
+ * @property {Function} onFieldInput
  */
 
 /**
@@ -79,9 +91,7 @@ export function updatePhoneMask(phoneInput, countryCode) {
  */
 export default class Form {
   constructor(options = {}) {
-    /**
-     * @type {FormOptions}
-     */
+    /** @type {FormOptions} */
     this.options = {
       selector: '.form-custom',
       onSubmit: () => {},
@@ -89,6 +99,7 @@ export default class Form {
       onValidate: () => {},
       ...options,
     };
+
     this.instances = new Map();
     this.init();
   }
@@ -105,9 +116,12 @@ export default class Form {
     }
 
     const forms = document.querySelectorAll(this.options.selector);
+
     for (const form of forms) {
       if (this.instances.has(form)) continue;
+
       const instance = this.createInstance(form);
+
       if (instance) {
         this.instances.set(form, instance);
       }
@@ -133,17 +147,32 @@ export default class Form {
       privacy: [...form.querySelectorAll('[data-privacy]')],
       country: form.querySelector('select[data-target="country"]'),
       nameMask: undefined,
+      validation: Object.hasOwn(form.dataset, 'validation'),
+      validationFields: [...form.querySelectorAll('[data-validate]')],
+      validationAttempted: false,
     };
 
     instance.onSubmit = (event) => {
+      if (instance.validation) {
+        instance.validationAttempted = true;
+
+        if (!this.validateInstance(instance)) {
+          event.preventDefault();
+
+          return;
+        }
+      }
+
       instance.options.onSubmit(instance.form, event);
     };
 
     instance.onClick = (event) => {
       const button = event.target.closest('.button');
+
       if (!button) return;
 
       const action = button.dataset.action;
+
       if (action === 'reset') {
         event.preventDefault();
         this.resetInstance(instance);
@@ -162,7 +191,18 @@ export default class Form {
       }
     };
 
+    instance.onFieldInput = (event) => {
+      if (!instance.validation || !instance.validationAttempted) return;
+
+      const field = event.target.closest('[data-validate]');
+
+      if (!field) return;
+
+      this.validateField(field);
+    };
+
     this.initInstance(instance);
+
     return instance;
   }
 
@@ -173,8 +213,11 @@ export default class Form {
     this.initNameMask(instance);
     this.initPhone(instance);
     this.initPrivacyListener(instance);
+    this.initValidation(instance);
 
-    if (instance.country) this.initCountrySelect(instance);
+    if (instance.country) {
+      this.initCountrySelect(instance);
+    }
 
     instance.form.addEventListener('submit', instance.onSubmit);
     instance.form.addEventListener('click', instance.onClick);
@@ -190,7 +233,10 @@ export default class Form {
 
   initPhone(instance) {
     if (!instance.phone) return;
-    const countryCode = instance.phone.dataset.countryCode || (instance.country?.value) || '7';
+
+    const countryCode =
+      instance.phone.dataset.countryCode || instance.country?.value || '7';
+
     initPhoneMask(instance.phone, countryCode);
   }
 
@@ -201,6 +247,104 @@ export default class Form {
     instance.form.addEventListener('change', instance.onPrivacyChange);
   }
 
+  initValidation(instance) {
+    if (!instance.validation) return;
+
+    instance.form.noValidate = true;
+    instance.form.addEventListener('input', instance.onFieldInput);
+    instance.form.addEventListener('change', instance.onFieldInput);
+  }
+
+  validateInstance(instance) {
+    let isValid = true;
+    let firstInvalidField;
+
+    for (const field of instance.validationFields) {
+      if (!this.validateField(field)) {
+        isValid = false;
+
+        if (!firstInvalidField) {
+          firstInvalidField = field;
+        }
+      }
+    }
+
+    if (firstInvalidField) {
+      firstInvalidField.focus();
+    }
+
+    instance.options.onValidate(instance.form, isValid);
+
+    return isValid;
+  }
+
+  validateField(field) {
+    const value = field.value.trim();
+    const isCheckable = field.type === 'checkbox' || field.type === 'radio';
+    const isEmpty = isCheckable ? !field.checked : value.length === 0;
+
+    let errorMessage = '';
+
+    if (field.required && isEmpty) {
+      errorMessage = field.dataset.errorRequired || 'Необходимо заполнить поле';
+    } else if (value && field.minLength > 0 && value.length < field.minLength) {
+      errorMessage =
+        field.dataset.errorMinlength || `Минимум ${field.minLength} символов`;
+    } else if (field.type === 'email' && value && !field.validity.valid) {
+      errorMessage = field.dataset.errorFormat || 'Неверный формат';
+    } else if (
+      process.env.NODE_ENV === 'development' &&
+      field.dataset.captchaValue &&
+      value !== field.dataset.captchaValue
+    ) {
+      errorMessage = field.dataset.errorCaptcha || 'Неверно указаны символы';
+    }
+
+    this.setFieldError(field, errorMessage);
+
+    return errorMessage.length === 0;
+  }
+
+  setFieldError(field, message) {
+    const wrapper = field.closest('[data-field]');
+
+    if (!wrapper) return;
+
+    let error = wrapper.querySelector('[data-field-error]');
+
+    if (!message) {
+      wrapper.classList.remove('is-error');
+      field.removeAttribute('aria-invalid');
+
+      if (error) {
+        error.remove();
+      }
+
+      return;
+    }
+
+    wrapper.classList.add('is-error');
+    field.setAttribute('aria-invalid', 'true');
+
+    if (!error) {
+      error = document.createElement('span');
+      error.classList.add('form__error');
+      error.dataset.fieldError = '';
+      error.setAttribute('role', 'alert');
+      wrapper.append(error);
+    }
+
+    error.textContent = message;
+  }
+
+  clearValidation(instance) {
+    instance.validationAttempted = false;
+
+    for (const field of instance.validationFields) {
+      this.setFieldError(field, '');
+    }
+  }
+
   /**
    * @param {FormInstance} instance
    */
@@ -208,8 +352,8 @@ export default class Form {
     if (!instance.submit) return;
 
     const allChecked = instance.privacy.every((item) => item.checked);
-    instance.submit.disabled = !allChecked;
 
+    instance.submit.disabled = !allChecked;
     instance.options.onValidate(instance.form, allChecked);
   }
 
@@ -228,10 +372,12 @@ export default class Form {
 
     if (instance.phone && phoneMasks.has(instance.phone)) {
       const mask = phoneMasks.get(instance.phone);
+
       mask.value = '';
       mask.updateValue();
     }
 
+    this.clearValidation(instance);
     this.updateSubmitState(instance);
     instance.options.onReset(instance.form);
   }
@@ -245,6 +391,8 @@ export default class Form {
     instance.form.removeEventListener('submit', instance.onSubmit);
     instance.form.removeEventListener('click', instance.onClick);
     instance.form.removeEventListener('change', instance.onPrivacyChange);
+    instance.form.removeEventListener('input', instance.onFieldInput);
+    instance.form.removeEventListener('change', instance.onFieldInput);
 
     if (instance.country) {
       instance.country.removeEventListener('change', instance.onCountryChange);
@@ -252,6 +400,7 @@ export default class Form {
 
     if (instance.phone && phoneMasks.has(instance.phone)) {
       const mask = phoneMasks.get(instance.phone);
+
       mask.destroy();
       phoneMasks.delete(instance.phone);
     }
@@ -270,7 +419,9 @@ export default class Form {
    * @returns {FormInstance | undefined}
    */
   get(form) {
-    const element = typeof form === 'string' ? document.querySelector(form) : form;
+    const element =
+      typeof form === 'string' ? document.querySelector(form) : form;
+
     return this.instances.get(element);
   }
 
@@ -285,7 +436,7 @@ export default class Form {
   }
 
   destroy() {
-    for (const [form, instance] of this.instances) {
+    for (const instance of this.instances.values()) {
       this.destroyInstance(instance);
     }
   }

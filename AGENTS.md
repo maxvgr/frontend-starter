@@ -1,67 +1,108 @@
-Ниже полный текст, который можно скопировать и использовать как `AGENTS.md` в другом проекте.
+# AGENTS.md
+
+# Frontend starter — правила работы
+
+Этот репозиторий — стартовый шаблон для вёрстки многостраничных сайтов с последующей интеграцией в CMS.
+
+Основная цель starter — хранить универсальные инструменты, которые нужны в большинстве проектов, но не тащить в новый проект дизайн, контент и бизнес-логику предыдущих сайтов.
+
+При работе с проектом приоритеты такие:
+
+1. не ломать существующую архитектуру без необходимости;
+2. делать минимальные изменения;
+3. переиспользовать общие компоненты;
+4. соблюдать Stylelint и ESLint;
+5. не добавлять в starter проектно-зависимый код;
+6. после существенных изменений проверять production-сборку.
 
 ---
 
-```markdown
-# Руководство по вёрстке и организации фронтенда
+## 1. Стек
 
-## 1. Общая информация
+- Webpack 5
+- Gulp 5
+- Yarn 4
+- PostHTML
+- Sass / SCSS
+- PostCSS
+- Vanilla JavaScript
+- Swiper
+- vanilla-lazyload
+- IMask
+- Stylelint
+- ESLint
 
-Фронтенд-шаблон для верстки статических веб-страниц с возможностью дальнейшей интеграции в CMS (например, WordPress). Проект использует Webpack, Gulp, SCSS, PostHTML и ванильный JavaScript.
+Дополнительные библиотеки подключаются только тогда, когда они действительно нужны большинству проектов или решают общую инфраструктурную задачу.
 
-## 2. Технологический стек
+---
 
-| Слой              | Технология                                                              |
-| ----------------- | ----------------------------------------------------------------------- |
-| Сборка            | Webpack 5 + Gulp 5                                                      |
-| Пакетный менеджер | Yarn 4.x                                                                |
-| CSS               | Sass/SCSS + PostCSS (autoprefixer, cssnano, сортировка медиа-запросов)  |
-| Линтеры           | Stylelint (standard-scss), ESLint (standard + unicorn)                  |
-| JS                | Ванильный ES2024, GSAP, vanilla-lazyload, imask                         |
-| HTML              | PostHTML: `<include>`, `<inline>`, условные теги `<if condition="...">` |
-| SVG               | SVG-спрайт с иконками, подключение через `<use href="...#id">`          |
+## 2. Общий принцип starter
 
-После любых изменений в `SCSS` или `JS` обязательно запускать линтеры с флагом `--fix`.
+В starter можно добавлять:
+
+- универсальные JS-компоненты;
+- базовые UI-компоненты;
+- общие утилиты;
+- инструменты сборки;
+- базовые шаблоны интеграции;
+- документацию;
+- решения, которые повторяются примерно в 80% проектов.
+
+В starter не следует добавлять:
+
+- дизайн конкретного проекта;
+- конкретную палитру бренда;
+- логотипы;
+- контент;
+- страницы конкретного сайта;
+- бизнес-логику каталога;
+- проектные API-ключи;
+- координаты, адреса и контакты;
+- специфические фильтры;
+- уникальные анимации и секции, которые вряд ли повторятся.
+
+---
 
 ## 3. Структура проекта
 
-```
+```text
 src/
 ├── assets/
+│   ├── favicons/
 │   ├── fonts/
-│   ├── images/
-│   │   ├── icons/        # SVG-иконки и спрайт
-│   │   ├── misc/         # технические изображения
-│   │   └── layout/       # макетные изображения
-│   └── favicons/
+│   └── images/
 ├── js/
 │   ├── app.js
-│   ├── global/
 │   ├── component/
+│   ├── global/
 │   ├── layout/
-│   ├── animation/
-│   └── libs/
+│   └── utils/
 ├── layout/
-│   ├── head.html
-│   ├── header.html
-│   ├── footer.html
 │   ├── block/
 │   ├── modal/
-│   ├── section/
-│   └── template/
+│   ├── template/
+│   ├── footer.html
+│   ├── head.html
+│   └── header.html
 ├── scss/
-│   ├── main.scss
-│   ├── abstracts/        # mixins, functions, variables
+│   ├── abstracts/
 │   ├── common/
-│   ├── settings/         # vars, fonts, container
+│   ├── layout/
+│   ├── settings/
 │   ├── vendors/
-│   └── layout/
-└── page-*.html, archive-*.html, single-*.html, misc-*.html
+│   └── main.scss
+└── *.html
 ```
 
-## 4. Создание HTML-страницы
+Не создавать новую верхнеуровневую структуру без реальной необходимости.
 
-Каждая страница — отдельный HTML-файл в `src/`.
+---
+
+## 4. HTML
+
+Страницы лежат непосредственно в `src/`.
+
+Базовый каркас:
 
 ```html
 <!DOCTYPE html>
@@ -70,15 +111,11 @@ src/
 <include src="layout/head.html"></include>
 
 <body class="page">
-  <include src="layout/header.html">
-    {
-    "mod": "sticky"
-    }
-  </include>
+  <include src="layout/header.html"></include>
 
   <main>
     <div id="cp-example" class="page__body">
-      <!-- секции -->
+
     </div>
     <!-- /.page__body -->
   </main>
@@ -89,400 +126,468 @@ src/
 </html>
 ```
 
-Обязательно:
-- `<include src="layout/head.html">`;
-- `<include src="layout/header.html">`;
-- `<include src="layout/footer.html">`;
-- `<body class="page">`;
-- `<main>`;
-- `<div class="page__body" id="...">` с ID страницы по правилам нейминга.
+Для повторяющихся фрагментов использовать PostHTML include:
 
-## 5. Нейминг страниц и секций
+```html
+<include src="layout/block/example.html"></include>
+```
 
-Страницы делятся на 4 типа по префиксам, как в WordPress:
+Для шаблонов с параметрами использовать данные include, а не копировать одинаковую разметку вручную.
 
-| Тип          | Префикс | HTML-файл        | Папка SCSS                   | ID страницы  | ID секции            |
-| ------------ | ------- | ---------------- | ---------------------------- | ------------ | -------------------- |
-| archive-page | `ap-`   | `archive-*.html` | `scss/layout/pages/archive/` | `ap-article` | `ap-article-content` |
-| common-page  | `cp-`   | `page-*.html`    | `scss/layout/pages/common/`  | `cp-about`   | `cp-about-hero`      |
-| misc-page    | `mp-`   | `misc-*.html`    | `scss/layout/pages/misc/`    | `mp-content` | `mp-content-text`    |
-| single-page  | `sp-`   | `single-*.html`  | `scss/layout/pages/single/`  | `sp-product` | `sp-product-content` |
+---
 
-Правила:
-- ID страницы: `{префикс}-{название}` на `.page__body`.
-- ID секции: `{префикс}-{название}-{секция}` на `<section class="section">`.
-- Если имя страницы уже содержит `content`, секция называется `...-content-text`, чтобы избежать `content-content`.
-- Сложные страницы (Главная, О компании) могут использовать собственные семантические имена секций: `hero`, `info`, `achievements`, `buy`.
+## 5. Комментарии в HTML
 
-## 6. Комментарии в HTML
+Не засорять HTML комментариями после каждого простого `div`.
 
-После каждого закрывающего `</div>` ставится комментарий с первым классом элемента:
+Закрывающие комментарии использовать только там, где они реально помогают читать вложенную структуру:
 
 ```html
 <div class="container">
   <div class="content">
-    <div class="content__text" data-editor>
-      ...
-    </div>
-    <!-- /.content__text -->
+    ...
   </div>
   <!-- /.content -->
 </div>
 <!-- /.container -->
 ```
 
-Это касается всех `div`: `page__body`, `container`, `content`, `swiper`, `swiper-wrapper`, BEM-блоков и их элементов.
+Для простых коротких элементов комментарий после `</div>` не нужен.
 
-## 7. Include и условные теги
+Не добавлять комментарий после `<picture>`.
 
-### Подключение блоков
+---
 
-```html
-<include src="layout/block/achievements.html"></include>
-```
+## 6. BEM
 
-### Передача данных
+Использовать BEM.
 
-```html
-<include src="layout/template/card/product.html">
-  {
-  "isPreorder": true,
-  "isNew": false
-  }
-</include>
-```
-
-### Условные теги внутри шаблона
-
-```html
-<div class="card-product__badges">
-  <if condition="isNew">
-    <div class="card-product__badge">Новинка</div>
-  </if>
-</div>
-
-<div class="card-product__action">
-  <if condition="isPreorder">
-    <button class="button button-primary" type="button">Под заказ</button>
-  </if>
-  <else>
-    <button class="button button-primary button-primary--accent" type="button">В корзину</button>
-  </else>
-</div>
-```
-
-## 8. data-editor — текстовые блоки
-
-Текстовые блоки, которые редактируются через CMS, помечаются атрибутом `data-editor`:
-
-```html
-<div class="content__text" data-editor>
-  <p>...</p>
-  <h2>...</h2>
-  <ul>...</ul>
-</div>
-```
-
-Принципы:
-- класс-обёртка отвечает только за позиционирование (ширина, отступы);
-- типографика наследуется из `src/scss/layout/components/editor/_editor.scss`;
-- не дублировать `font-size`, `line-height`, `font-weight`, отступы между параграфами и списками.
-
-## 9. Изображения, иконки, SVG
-
-### Корневая структура
-
-```
-src/assets/images/
-├── icons/
-│   ├── package.svg          # основной SVG-спрайт
-│   ├── payment/
-│   └── social/
-├── misc/
-│   └── preloader.svg
-└── layout/
-    ├── global/
-    ├── modal/
-    ├── section/
-    ├── block/
-    └── page/
-```
-
-### Иконки
-
-Используются из SVG-спрайта через `<use>`:
-
-```html
-<svg class="icon">
-  <use href="assets/images/icons/package.svg#arrow-dropdown"></use>
-</svg>
-```
-
-ID иконок именуются по шаблону `группа-назначение`:
-- `arrow-*` — стрелки;
-- `misc-*` — сервисные иконки;
-- `profile-*` — личный кабинет;
-- `payment-*` — способы оплаты;
-- `social-*` — соцсети.
-
-### Макетные изображения
-
-Папки в `layout/` повторяют структуру проекта:
-
-| Расположение            | Пример пути                                         |
-| ----------------------- | --------------------------------------------------- |
-| Глобальные элементы     | `assets/images/layout/global/footer/reward_1.png`   |
-| Модальные окна          | `assets/images/layout/modal/painting/art.svg`       |
-| Переиспользуемые секции | `assets/images/layout/section/callback/picture.png` |
-| Страницы                | `assets/images/layout/page/cp-home/hero/bg_pc.jpg`  |
-
-Папка страницы = ID страницы, подпапки = имена секций:
-
-```text
-layout/page/cp-home/hero/
-layout/page/cp-home/about/
-layout/page/cp-home/buy/
-layout/page/cp-about/textblock/
-layout/page/sp-product/colors/
-```
-
-### Адаптивные фоны
-
-Имена файлов для адаптивных версий:
-
-```html
-<picture class="hero__bg lazy">
-  <source media="(max-width: 767px)" srcset="assets/images/layout/page/cp-home/hero/bg_mobile.jpg">
-  <source media="(max-width: 1023px)" srcset="assets/images/layout/page/cp-home/hero/bg_tablet.jpg">
-  <img class="image image--cover lazy__item lazy__item--blur" data-src="assets/images/layout/page/cp-home/hero/bg_pc.jpg" alt="">
-</picture>
-```
-
-| Имя             | Устройство |
-| --------------- | ---------- |
-| `bg_pc.jpg`     | десктоп    |
-| `bg_tablet.jpg` | планшет    |
-| `bg_mobile.jpg` | телефон    |
-
-### Ленивая загрузка
-
-```html
-<img class="image image--cover lazy__item" data-src="..." alt="">
-<picture class="lazy">
-  <img class="image image--cover lazy__item lazy__item--blur" data-src="..." alt="">
-</picture>
-```
-
-## 10. SCSS: переменные и принципы
-
-### CSS-переменные vs SASS-переменные
-
-```scss
-:root {
-  // CSS-переменные — могут меняться в медиа-запросах
-  --font-title-large: 50px;
-  --font-title-medium: 32px;
-  --font-text-regular: 16px;
-  --line-height-large: 1.5;
-
-  @include mq($until: desktop) {
-    --font-title-large: 36px;
-  }
-
-  @include mq($until: tablet) {
-    --font-title-large: 32px;
-  }
-}
-
-// SASS-переменные — константы
-$transition-time: 0.3s;
-$palette-black: #14181c;
-$weight-Light: 300;
-```
-
-Правило:
-- CSS-переменные (`--*`) — для значений, которые адаптируются.
-- SASS-переменные (`$*`) — для констант: цвета, толщины шрифта, переходы.
-
-### Типографика
-
-```scss
-body {
-  font-family: $font-default;
-  font-size: var(--font-text-regular);
-  font-weight: $weight-Light;
-  line-height: var(--line-height-large);
-}
-
-h1, h2, h3, h4, h5 {
-  font-weight: $weight-Regular;
-  line-height: var(--line-height-small);
-}
-```
-
-Размеры шрифтов не привязаны к HTML-тегам, а описывают визуальный уровень:
-- `--font-title-large`
-- `--font-title-medium`
-- `--font-title-small`
-- `--font-text-large`
-- `--font-text-big`
-- `--font-text-regular`
-- `--font-text-small`
-
-### Палитра и семантические цвета
-
-```scss
-$palette-white: #ffffff;
-$palette-gray: #e9ebee;
-$palette-black: #14181c;
-
-$palette-accent: #1976d2;
-$palette-neutral: #87919b;
-
-$color-text__primary: $palette-black;
-$link-hover-color: $palette-accent !default;
-```
-
-- `$palette-*` — абстрактные цвета.
-- `$color-text__primary`, `$link-color` — семантические роли.
-
-### Контейнеры
-
-```scss
-$container-max-widths: (
-  mobile: 480px,
-  tablet: 768px,
-  notebook: 991px,
-  laptop: 1200px,
-  desktop: 1700px
-);
-
-$container-wide-width: 1800px;
-$container-padding: 16px;
-```
-
-Миксин `make-container` генерирует адаптивный контейнер. Класс `.container--wide` используется для широких блоков (шапка, футер, слайдеры).
-
-### z-index
-
-```scss
-$z-index-header: 50;
-$z-index-overlay: 51;
-$z-index-menu: 52;
-$z-index-modal: 53;
-$z-index-toast: 54;
-```
-
-Используются переменные, чтобы слои не конфликтовали и управлялись централизованно.
-
-## 11. BEM и плоская вложенность
-
-### Базовый нейминг
+Пример:
 
 ```html
 <div class="card">
-  <h3 class="card__title">Заголовок</h3>
-  <picture class="card__picture">
-    <img class="card__picture-img" src="..." alt="">
-  </picture>
-  <p class="card__text">Текст</p>
+  <div class="card__title"></div>
+  <div class="card__content"></div>
 </div>
 ```
 
+Модификаторы:
+
+```html
+<div class="card card--large"></div>
+```
+
+В проекте для модификаторов используются два дефиса:
+
+```text
+block--modifier
+block__element--modifier
+```
+
+Не создавать конструкции вида:
+
+```text
+.block__body__title
+```
+
+---
+
+## 7. SCSS
+
+Стили организуются по существующей структуре проекта.
+
+Перед созданием нового файла сначала проверить, нельзя ли использовать или расширить существующий компонент.
+
+Соблюдать порядок свойств, заданный `.stylelintrc`.
+
+В частности:
+
 ```scss
-.card {
-  &__title { }
-  &__picture {
-    &-img { }
-  }
-  &__text { }
+font-weight: 700;
+font-size: 16px;
+```
+
+`font-weight` должен идти раньше `font-size`.
+
+Не дублировать у дочерних элементов свойства, которые уже наследуются от `body`, если значения не отличаются.
+
+Цвет задавать только тогда, когда он отличается от унаследованного.
+
+Не использовать `!important` без необходимости.
+
+Не отключать правила Stylelint ради локального исправления.
+
+---
+
+## 8. CSS- и Sass-переменные
+
+CSS custom properties использовать для значений, которые должны изменяться адаптивно:
+
+```scss
+:root {
+  --font-title-large: 64px;
 }
 ```
 
-### Правила вложенности
-
-- `&__element` пишется только внутри блока.
-- Для составных имён используется `&-suffix`: `&__card` → `&-title` = `.content__card-title`.
-- Глубина вложенности — максимум 2 уровня: `#id { .block { &__element {} } }`.
-- Не вкладывать `&__` в `&__`: `.block__body__title` — это не BEM.
-
-## 12. CSS Grid и адаптив
-
-### Двухколоночные макеты
+Sass-переменные использовать для констант:
 
 ```scss
-.content {
-  @include mq($until: laptop) {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  display: grid;
-  grid-template-columns: 510px 1fr;
-  gap: 64px;
-}
+$palette-black: #000000;
+$transition-time: 0.3s;
 ```
 
-### Сетки карточек
+Цвета желательно разделять на:
 
-```scss
-&__grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
+- палитру `$palette-*`;
+- семантические переменные `$color-*`.
+
+---
+
+## 9. Адаптив
+
+Использовать существующую систему контейнеров и `mq()`.
+
+Не создавать случайные breakpoint-значения, если задача решается существующими семантическими брейкпоинтами.
+
+SCSS и JavaScript должны использовать одну систему брейкпоинтов.
+
+В JS значения брейкпоинтов берутся из CSS-переменных через существующие helpers.
+
+---
+
+## 10. Изображения
+
+Для lazy-load использовать существующую структуру:
+
+```html
+<picture class="lazy">
+  <img class="image image--cover lazy__item" data-src="..." alt="">
+</picture>
 ```
 
-### Принципы
+Не использовать `src` вместо `data-src`, если изображение должно загружаться lazy-load механизмом проекта.
 
-- `minmax(0, 1fr)` вместо `1fr`, чтобы контент не растягивал колонку.
-- `min-height: 2lh` для выравнивания заголовков в карточках.
-- `aspect-ratio` для изображений вместо фиксированных `width`/`height`.
-- Округлять значения до «чистых» чисел: `549px` → `550px`, `512px` → `510px`.
-- Не дублировать наследуемые свойства: `color`, `font-weight`, `line-height`.
-- Классы вешаются на семантические элементы (`<picture>`, `<h3>`, `<img>`), без лишних `div`-обёрток.
+Для изображения выбирать осмысленный `alt`.
 
-## 13. JavaScript
+Для чисто декоративного изображения допустим:
 
-- ES6+ классы.
-- JSDoc для методов.
-- Экспорт по умолчанию.
-- Глобальный доступ через `window.App`.
-- GSAP-анимации подключаются через `data-animation="тип"` на секциях.
-- Использование `querySelectorAll` + `for...of` для обработки всех элементов.
-- ScrollTrigger с `toggleActions: 'play none none reverse'`.
-- `ease: 'power2.out'` для естественных анимаций.
+```html
+alt=""
+```
 
-## 14. Линтеры и автоисправление
+SVG-иконки по возможности хранить в общем sprite и подключать через `<use>`.
 
-После изменений в `SCSS` или `JS`:
+---
+
+## 11. JavaScript
+
+Использовать vanilla JavaScript и существующие классы/компоненты.
+
+Переиспользуемый компонент должен:
+
+- иметь понятный selector;
+- поддерживать несколько экземпляров на странице;
+- не падать при отсутствии соответствующей разметки;
+- по возможности иметь `update()` для динамически добавленных элементов;
+- корректно удалять listeners в `destroy()`;
+- не содержать бизнес-логику одного проекта.
+
+Не добавлять глобальные переменные без необходимости.
+
+Общие публичные экземпляры могут храниться в:
+
+```js
+window.App
+```
+
+---
+
+## 12. Инициализация компонентов
+
+Общие компоненты инициализируются в:
+
+```text
+src/js/global/init.js
+```
+
+Компоненты, которые нужны не каждому проекту, допускается хранить готовыми, но отключёнными.
+
+Пример:
+
+```js
+// import Gallery from "../component/gallery";
+```
+
+и:
+
+```js
+// window.App.gallery = new Gallery();
+```
+
+Это предпочтительнее, чем удалять универсальный компонент из starter и каждый раз искать его в старых проектах.
+
+---
+
+## 13. Swiper
+
+Swiper является базовой зависимостью starter.
+
+Не импортировать весь Swiper bundle без необходимости.
+
+Подключать только используемые модули:
+
+```js
+import { Swiper } from "swiper";
+import { Navigation, Pagination } from "swiper/modules";
+```
+
+Для универсальных слайдеров стараться создавать отдельные переиспользуемые компоненты.
+
+Настройки уникального hero/news/etc. конкретного проекта не переносить в starter.
+
+---
+
+## 14. Modal
+
+Использовать существующий компонент `Modal`.
+
+Триггер открытия:
+
+```html
+data-modal-open="example"
+```
+
+Модальное окно:
+
+```html
+data-modal="example"
+```
+
+Триггер закрытия:
+
+```html
+data-modal-close
+```
+
+Не писать отдельную реализацию модального окна, если существующий компонент покрывает задачу.
+
+---
+
+## 15. Accordion
+
+Использовать существующий `Accordion` / `Collapse`.
+
+Не реализовывать раскрытие через новый самостоятельный скрипт, если оно укладывается в возможности общего компонента.
+
+---
+
+## 16. Tabs
+
+Для вкладок использовать общий `Tab`.
+
+Активная вкладка в HTML должна быть источником начального состояния компонента.
+
+Если компонент расширяется, изменение должно оставаться универсальным.
+
+---
+
+## 17. Gallery
+
+Для типовых галерей использовать общий `Gallery`.
+
+Gallery должна поддерживать desktop и mobile без отдельного проектного скрипта.
+
+Специфическое поведение добавлять через модификатор или option, если оно потенциально пригодится повторно.
+
+---
+
+## 18. Формы
+
+Общие формы используют:
+
+```html
+<form class="form form-custom"></form>
+```
+
+Обязательное согласие:
+
+```html
+data-privacy
+```
+
+Клиентская валидация включается только там, где она нужна:
+
+```html
+data-validation
+```
+
+Проверяемые поля:
+
+```html
+data-validate
+```
+
+Frontend-валидация не заменяет серверную.
+
+Интеграция с backend подробнее описана в `BACKEND.md`.
+
+---
+
+## 19. Успешная AJAX-отправка
+
+После успешной серверной обработки формы backend/frontend integration может отправить событие:
+
+```js
+window.dispatchEvent(
+  new CustomEvent("formSuccess", {
+    detail: { form },
+  }),
+);
+```
+
+Не считать форму успешно отправленной до подтверждения от сервера.
+
+---
+
+## 20. Cookie Consent
+
+Cookie Consent — универсальный инструмент, но в чистом starter он не должен автоматически показываться.
+
+Разметка, стили и JS-компонент могут находиться в starter в готовом виде, а подключение оставаться выключенным до необходимости.
+
+При включении consent необходимо реально контролировать запуск необязательных cookie/analytics scripts.
+
+Декоративный баннер, который ничего не блокирует, не считается полноценным consent-механизмом.
+
+---
+
+## 21. data-editor
+
+Контент, который предполагается редактировать через CMS, можно помечать:
+
+```html
+data-editor
+```
+
+Стили контентной области должны идти из общего editor-компонента.
+
+Не задавать заново типографику каждому `p`, `ul`, `ol`, `h2` и т. п. внутри конкретной страницы, если это типичный CMS-контент.
+
+---
+
+## 22. Backend integration
+
+Перед передачей проекта backend-разработчику проверить и при необходимости дополнить:
+
+```text
+BACKEND.md
+```
+
+В `BACKEND.md` фиксируются:
+
+- формы;
+- имена полей;
+- AJAX-контракт;
+- динамические блоки;
+- внешние API;
+- особенности CMS;
+- вещи, которые нельзя ломать при интеграции.
+
+Проектно-зависимую информацию добавлять в раздел `Project-specific`, а не в общие правила starter.
+
+---
+
+## 23. Линтеры
+
+Не игнорировать предупреждения ESLint и Stylelint.
+
+После существенных изменений JS/SCSS исправлять ошибки линтеров до завершения задачи.
+
+Не менять `.eslintrc` или `.stylelintrc` только для того, чтобы скрыть ошибку собственного кода.
+
+---
+
+## 24. Проверка сборки
+
+После изменений, которые затрагивают:
+
+- зависимости;
+- Webpack;
+- PostHTML;
+- JS;
+- SCSS;
+- общие компоненты,
+
+обязательно выполнить:
 
 ```bash
-npx stylelint "src/scss/**/*.scss" --fix
-npx eslint "src/js/**/*.js" --fix
+yarn build
 ```
 
-Или через скрипты `package.json`.
+Production build должен завершаться без ошибок.
 
-## 15. Основные команды
+Если изменение затрагивает только документацию, build запускать не обязательно.
+
+---
+
+## 25. package.json и yarn.lock
+
+Зависимости добавлять через Yarn.
+
+Не редактировать `yarn.lock` вручную.
+
+После изменения `package.json` выполнить:
 
 ```bash
-yarn run dev       # локальный сервер с hot reload
-yarn run build     # production-сборка
-yarn run build_wp  # сборка для WordPress
-yarn run deploy    # деплой на FTP
+yarn install
 ```
 
-## Основные принципы в одном списке
+`package.json` и `yarn.lock` должны коммититься вместе.
 
-1. CSS-переменные — для адаптивных значений, SASS-переменные — для констант.
-2. Использовать существующие переменные из `src/scss/settings/_vars.scss`.
-3. Пути к изображениям повторяют структуру: `assets/images/layout/page/{id-страницы}/{секция}/{файл}`.
-4. Иконки — из спрайта `package.svg` через `<use>`.
-5. `data-editor` для текстовых CMS-блоков.
-6. ID страниц и секций по префиксам `cp-`, `ap-`, `mp-`, `sp-`.
-7. Плоский BEM, глубина вложенности ≤ 2.
-8. CSS Grid для структуры, `minmax(0, 1fr)` для карточек.
-9. Комментарии `<!-- /.class-name -->` после каждого `</div>`.
-10. После изменений запускать `stylelint` и `eslint` с `--fix`.
-```
+---
+
+## 26. Минимальные изменения
+
+При исправлении локальной задачи:
+
+- не переписывать соседние компоненты без необходимости;
+- не менять форматирование всего файла;
+- не переименовывать существующие классы без причины;
+- не менять публичный API компонента, если это не требуется;
+- учитывать влияние общих файлов на все страницы.
+
+Если задача требует архитектурного изменения, сначала определить, действительно ли оно полезно starter в целом.
+
+---
+
+## 27. Что проверять перед завершением задачи
+
+Минимальный чек:
+
+1. Код соответствует существующей архитектуре.
+2. Нет лишнего проектно-зависимого кода.
+3. HTML-структура не усложнена без необходимости.
+4. Stylelint / ESLint не ругаются на новый код.
+5. `yarn build` проходит.
+6. Desktop не сломан.
+7. Mobile не сломан.
+8. Общие компоненты проверены минимум в одном реальном сценарии.
+9. Если изменился frontend/backend контракт — обновлён `BACKEND.md`.
+
+---
+
+## 28. Главное правило
+
+Starter должен экономить время на следующем проекте.
+
+Если новая возможность:
+
+- используется часто;
+- универсальна;
+- не навязывает дизайн;
+- не усложняет старт проекта;
+- уменьшает повторную ручную работу,
+
+её можно добавить в starter.
+
+Если решение относится только к одному сайту — оно должно остаться в этом сайте.

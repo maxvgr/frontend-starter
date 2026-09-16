@@ -1,9 +1,10 @@
 .form {
-  &__wrapper {
+  &__error {
+    display: block;
 
-  }
+    margin-top: 6px;
 
-  &__action {
-
+    font-size: var(--font-text-small);
+    line-height: var(--line-height-small);
   }
 }

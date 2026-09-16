@@ -1,0 +1,51 @@
+.cookie-note {
+  @include mq($until: tablet) {
+    right: 16px;
+    left: 16px;
+
+    flex-direction: column;
+    align-items: stretch;
+
+    width: auto;
+    max-width: none;
+
+    &__button {
+      width: 100%;
+    }
+  }
+
+  position: fixed;
+  z-index: 100;
+  right: 16px;
+  bottom: 16px;
+
+  display: flex;
+  gap: 20px;
+  align-items: center;
+
+  width: calc(100% - 32px);
+  max-width: 620px;
+  padding: 20px;
+
+  border: 1px solid rgba($palette-black, 0.12);
+  border-radius: var(--border-radius);
+
+  background-color: $palette-white;
+  color: $color-text__primary;
+  box-shadow: 0 8px 30px rgba($palette-black, 0.12);
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__text {
+    flex: 1 1 auto;
+
+    font-size: var(--font-text-small);
+    line-height: var(--line-height-medium);
+  }
+
+  &__button {
+    flex: 0 0 auto;
+  }
+}

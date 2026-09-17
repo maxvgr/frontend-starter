@@ -3,7 +3,6 @@
     "es2024": true,
     "browser": true,
     "commonjs": true,
-    "jquery": true
   },
   "extends": [
     "standard",
@@ -20,7 +19,6 @@
     "gulpfile.js"
   ],
   "rules": {
-    "no-unused-vars": "off",
     "no-new": "off",
     "quotes": "off",
     "comma-dangle": "off",

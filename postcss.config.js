@@ -1,6 +1,6 @@
 module.exports = ({ env }) => ({
   syntax: 'postcss-scss',
-  map: true,
+  map: env !== 'production',
   plugins: {
     autoprefixer: {},
     'postcss-sort-media-queries': {},

@@ -1,30 +1,31 @@
-const path = require('path');
-const fs = require('fs');
-const { execSync } = require('child_process');
+const path = require("path");
+const fs = require("fs");
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlBeautifyPlugin = require('@nurminen/html-beautify-webpack-plugin');
-const postHtmlInclude = require('posthtml-include');
-const inlineSVG = require('posthtml-inline-svg');
-const expressions = require('posthtml-expressions');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlBeautifyPlugin = require("@nurminen/html-beautify-webpack-plugin");
+const postHtmlInclude = require("posthtml-include");
+const inlineSVG = require("posthtml-inline-svg");
+const expressions = require("posthtml-expressions");
 
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
 
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const StylelintPlugin = require('stylelint-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const StylelintPlugin = require("stylelint-webpack-plugin");
 
-const ESLintPlugin = require('eslint-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const ESLintPlugin = require("eslint-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
-const cacheDir = path.resolve(__dirname, 'node_modules', '.cache');
+const cacheDir = path.resolve(__dirname, "node_modules", ".cache");
 if (!fs.existsSync(cacheDir)) {
   fs.mkdirSync(cacheDir, { recursive: true });
 }
 
-const postHtmlCustomLoader = path.resolve(cacheDir, 'posthtml-watch-loader.js');
-fs.writeFileSync(postHtmlCustomLoader, `
+const postHtmlCustomLoader = path.resolve(cacheDir, "posthtml-watch-loader.js");
+fs.writeFileSync(
+  postHtmlCustomLoader,
+  `
   const path = require('path');
   module.exports = function(content) {
     const regex = /<include[^>]+src="([^"]+)"/gi;
@@ -34,50 +35,51 @@ fs.writeFileSync(postHtmlCustomLoader, `
     }
     return content;
   };
-`);
+`,
+);
 
-const includeRoot = path.resolve(__dirname, 'src');
+const includeRoot = path.resolve(__dirname, "src");
 const pages = fs
   .readdirSync(includeRoot)
-  .filter(file => file.endsWith('.html'));
+  .filter((file) => file.endsWith(".html"));
 
 module.exports = (env, argv) => {
-  const isProduction = argv.mode === 'production';
-  const buildDateValue = new Intl.DateTimeFormat('ru-RU').format(new Date());
+  const isProduction = argv.mode === "production";
+  const buildDateValue = new Intl.DateTimeFormat("ru-RU").format(new Date());
 
   return {
-    entry: './src/js/app.js',
+    entry: "./src/js/app.js",
     stats: {
-      preset: 'errors-warnings',
+      preset: "errors-warnings",
       children: false,
       errorStack: false,
       moduleTrace: false,
     },
 
     infrastructureLogging: {
-      level: 'warn',
+      level: "warn",
     },
 
-    mode: isProduction ? 'production' : 'development',
-    devtool: 'source-map',
+    mode: isProduction ? "production" : "development",
+    devtool: isProduction ? false : "source-map",
 
     output: {
-      filename: 'js/bundle.js',
-      path: path.resolve(__dirname, 'dist'),
+      filename: "js/bundle.js",
+      path: path.resolve(__dirname, "dist"),
       clean: true,
       assetModuleFilename: (pathData) => {
         const filepath = path
           .dirname(pathData.filename)
-          .split('/')
+          .split("/")
           .slice(1)
-          .join('/');
+          .join("/");
         return `${filepath}/[name][ext]`;
       },
     },
 
     resolve: {
       alias: {
-        '@assets': path.resolve(__dirname, 'src/assets'),
+        "@assets": path.resolve(__dirname, "src/assets"),
       },
     },
 
@@ -88,14 +90,14 @@ module.exports = (env, argv) => {
           test: /\.html$/i,
           use: [
             {
-              loader: 'html-loader',
+              loader: "html-loader",
               options: {
                 esModule: false,
                 minimize: false,
               },
             },
             {
-              loader: 'posthtml-loader',
+              loader: "posthtml-loader",
               options: {
                 plugins: [
                   postHtmlInclude({
@@ -110,8 +112,8 @@ module.exports = (env, argv) => {
                   }),
                   inlineSVG({
                     cwd: includeRoot,
-                    tag: 'inline',
-                    attr: 'src',
+                    tag: "inline",
+                    attr: "src",
                     svgo: {
                       plugins: [
                         { removeXMLNS: true },
@@ -125,19 +127,19 @@ module.exports = (env, argv) => {
             },
             {
               loader: postHtmlCustomLoader,
-            }
+            },
           ],
         },
 
         /* ASSETS */
         {
           test: /\.(png|svg|jpe?g|gif|mp4|webp)$/i,
-          type: 'asset/resource',
+          type: "asset/resource",
         },
 
         {
           test: /\.(woff2?|ttf|eot|otf)$/i,
-          type: 'asset/resource',
+          type: "asset/resource",
         },
 
         /* CSS */
@@ -146,15 +148,17 @@ module.exports = (env, argv) => {
           use: [
             MiniCssExtractPlugin.loader,
             {
-              loader: 'css-loader',
+              loader: "css-loader",
               options: {
                 sourceMap: !isProduction,
+                importLoaders: 2,
+                modules: false,
               },
             },
             {
-              loader: 'postcss-loader',
+              loader: "postcss-loader",
               options: {
-                sourceMap: true,
+                sourceMap: !isProduction,
               },
             },
           ],
@@ -167,7 +171,7 @@ module.exports = (env, argv) => {
           use: [
             MiniCssExtractPlugin.loader,
             {
-              loader: 'css-loader',
+              loader: "css-loader",
               options: {
                 sourceMap: true,
                 importLoaders: 2,
@@ -175,18 +179,22 @@ module.exports = (env, argv) => {
               },
             },
             {
-              loader: 'postcss-loader',
+              loader: "postcss-loader",
               options: {
-                sourceMap: true,
+                sourceMap: !isProduction,
               },
             },
             {
-              loader: 'sass-loader',
+              loader: "sass-loader",
               options: {
                 sourceMap: !isProduction,
                 sassOptions: {
-                  silenceDeprecations: ['legacy-js-api', 'import', 'global-builtin'],
-                  outputStyle: isProduction ? 'compressed' : 'expanded',
+                  silenceDeprecations: [
+                    "legacy-js-api",
+                    "import",
+                    "global-builtin",
+                  ],
+                  outputStyle: isProduction ? "compressed" : "expanded",
                 },
               },
             },
@@ -200,11 +208,11 @@ module.exports = (env, argv) => {
       new StylelintPlugin({ allowEmptyInput: true }),
 
       ...pages.map(
-        page =>
+        (page) =>
           new HtmlWebpackPlugin({
-            template: path.join(__dirname, 'src', page),
+            template: path.join(__dirname, "src", page),
             filename: page,
-            inject: 'body',
+            inject: "body",
             minify: false,
           }),
       ),
@@ -221,40 +229,39 @@ module.exports = (env, argv) => {
         },
       }),
 
-      new MiniCssExtractPlugin({ filename: 'css/[name].css' }),
+      new MiniCssExtractPlugin({ filename: "css/[name].css" }),
       new CopyWebpackPlugin({
-        patterns: [{ from: './src/assets', to: 'assets/' }],
+        patterns: [{ from: "./src/assets", to: "assets/" }],
       }),
-
 
       isProduction &&
-      new FaviconsWebpackPlugin({
-        logo: './src/assets/favicons/favicon.png',
-        prefix: 'assets/favicons/',
-        favicons: {
-          icons: {
-            favicons: true,
-            android: false,
-            appleIcon: false,
-            appleStartup: false,
-            windows: false,
-            yandex: false,
+        new FaviconsWebpackPlugin({
+          logo: "./src/assets/favicons/favicon.png",
+          prefix: "assets/favicons/",
+          favicons: {
+            icons: {
+              favicons: true,
+              android: false,
+              appleIcon: false,
+              appleStartup: false,
+              windows: false,
+              yandex: false,
+            },
           },
-        },
-      }),
+        }),
     ].filter(Boolean),
 
     devServer: {
       hot: true,
-      port: 'auto',
-      static: path.resolve(__dirname, 'dist'),
-      watchFiles: ['src/**/*.html'],
+      port: "auto",
+      static: path.resolve(__dirname, "dist"),
+      watchFiles: ["src/**/*.html"],
       client: {
         overlay: {
           errors: true,
           warnings: false,
         },
-      }
+      },
     },
 
     optimization: {
@@ -269,7 +276,7 @@ module.exports = (env, argv) => {
     },
 
     performance: {
-      hints: isProduction ? 'warning' : false,
+      hints: isProduction ? "warning" : false,
     },
   };
 };

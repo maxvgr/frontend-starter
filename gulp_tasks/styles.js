@@ -6,22 +6,27 @@ const rename = require('gulp-rename');
 const replace = require('gulp-replace');
 const header = require('gulp-header');
 
-/*
-- Прегенерация описания для темы Wordpress
-- Смена путей ассетов
-*/
+require('dotenv').config({ quiet: true });
+
+const theme = {
+  name: process.env.WP_THEME_NAME || 'Theme',
+  description: process.env.WP_THEME_DESCRIPTION || '',
+  author: process.env.WP_THEME_AUTHOR || '',
+  authorUri: process.env.WP_THEME_AUTHOR_URI || '',
+  version: process.env.WP_THEME_VERSION || '1.0.0',
+};
 
 task('css', () => src(path.style.folder.build + path.style.name.build)
   .pipe(header([
     '/*',
-    'Theme Name: ШАБЛОН',
-    'Description: -',
-    'Author: acr0matic',
-    'Author URI: https://artfactor.ru/',
-    'Version: 1.0.0',
+    `Theme Name: ${theme.name}`,
+    `Description: ${theme.description}`,
+    `Author: ${theme.author}`,
+    `Author URI: ${theme.authorUri}`,
+    `Version: ${theme.version}`,
     '*/',
     '',
-    ''
+    '',
   ].join('\n')))
   .pipe(replace('../assets/', 'assets/'))
   .pipe(rename(path.style.name.theme))

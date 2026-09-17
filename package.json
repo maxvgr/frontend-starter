@@ -13,12 +13,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maxvgr/new-build.git"
+    "url": "git+https://github.com/maxvgr/frontend-starter.git"
   },
   "bugs": {
-    "url": "https://github.com/maxvgr/new-build/issues"
+    "url": "https://github.com/maxvgr/frontend-starter/issues"
   },
-  "homepage": "https://github.com/maxvgr/new-build#readme",
+  "homepage": "https://github.com/maxvgr/frontend-starter#readme",
   "packageManager": "yarn@4.18.0",
   "devDependencies": {
     "@nurminen/html-beautify-webpack-plugin": "^1.1.4",
@@ -40,7 +40,6 @@
     "eslint-webpack-plugin": "^4.2.0",
     "favicons": "^7.2.0",
     "favicons-webpack-plugin": "^6.0.1",
-    "filemanager-webpack-plugin": "^8.0.0",
     "glob": "^11.0.3",
     "gulp": "^5.0.1",
     "gulp-header": "^2.0.9",
@@ -48,7 +47,6 @@
     "gulp-replace": "^1.1.4",
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.3",
-    "image-minimizer-webpack-plugin": "^3.8.3",
     "imagemin": "^8.0.1",
     "mini-css-extract-plugin": "^2.9.2",
     "postcss": "^8.5.3",
@@ -59,12 +57,10 @@
     "posthtml-include": "^2.0.1",
     "posthtml-inline-svg": "^0.2.0",
     "posthtml-loader": "^2.0.1",
-    "purgecss-webpack-plugin": "^7.0.2",
     "require-dir": "^1.2.0",
     "sass": "^1.69.5",
     "sass-loader": "^13.3.2",
     "sharp": "^0.33.5",
-    "style-loader": "^4.0.0",
     "stylelint": "^15.11.0",
     "stylelint-config-standard-scss": "^11.1.0",
     "stylelint-order": "^6.0.4",
@@ -79,8 +75,7 @@
     "dev": "webpack serve --mode=development --progress --open",
     "build": "webpack --mode=production --progress",
     "build_wp": "webpack --mode=production --progress && gulp styles && gulp scripts && gulp layout",
-    "deploy": "node ./node_scripts/deploy.js",
-    "create": "node ./node_scripts/create.js"
+    "deploy": "node ./node_scripts/deploy.js"
   },
   "dependencies": {
     "imask": "^7.6.1",

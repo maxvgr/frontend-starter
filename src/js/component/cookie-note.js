@@ -23,13 +23,13 @@ export default class CookieNote {
   }
 
   init() {
+    if (this.acceptButton) {
+      this.acceptButton.addEventListener('click', this.onAccept);
+    }
+
     if (this.hasConsent()) {
       this.hide();
       return;
-    }
-
-    if (this.acceptButton) {
-      this.acceptButton.addEventListener('click', this.onAccept);
     }
 
     this.show();

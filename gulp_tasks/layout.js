@@ -1,5 +1,5 @@
 const path = require('../gulpfile');
-const { task, src, series, dest } = require('gulp');
+const { task, src, dest } = require('gulp');
 
 const replace = require('gulp-replace');
 

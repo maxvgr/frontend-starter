@@ -2,11 +2,9 @@ const path = require('../gulpfile');
 const { task, src, series, dest } = require('gulp');
 
 const del = require('del');
-const replace = require('gulp-replace');
 
 /*
-- Прегенерация описания для темы Wordpress
-- Смена путей ассетов
+- Перенос JS-файла в структуру WordPress-темы
 */
 
 task('js', () => src(path.scripts.folder.build + path.scripts.name)

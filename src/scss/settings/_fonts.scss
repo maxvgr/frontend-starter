@@ -19,7 +19,7 @@ body {
   font-size: var(--font-text-regular);
   font-family: $font-default;
 
-  line-height: var(--line-height-text);
+  line-height: var(--line-height-large);
 }
 
 h1,
@@ -27,5 +27,5 @@ h2,
 h3,
 h4,
 h5 {
-  line-height: var(--line-height-title);
+  line-height: var(--line-height-small);
 }

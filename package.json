@@ -1,14 +1,24 @@
 {
-  "version": "2.0.0",
+  "name": "frontend-starter",
+  "version": "2.1.0",
+  "description": "Стартовый шаблон для адаптивной многостраничной вёрстки",
   "license": "MIT",
-  "name": "frontend-reborn",
-  "description": "",
   "author": {
-    "email": "work.acr0matic@gmail.com",
-    "name": "acr0matic"
+    "name": "Max V Grushin"
   },
-  "repository": "github:acr0matic/frontend-reborn",
-  "bugs": "https://github.com/acr0matic/frontend-reborn/issues",
+  "contributors": [
+    {
+      "name": "acr0matic"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxvgr/new-build.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maxvgr/new-build/issues"
+  },
+  "homepage": "https://github.com/maxvgr/new-build#readme",
   "packageManager": "yarn@4.18.0",
   "devDependencies": {
     "@nurminen/html-beautify-webpack-plugin": "^1.1.4",

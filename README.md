@@ -109,10 +109,115 @@ yarn build_wp
 Production-сборка с дополнительной обработкой файлов для WordPress через Gulp.
 
 ```bash
+yarn fonts:convert
+```
+
+Конвертация локальных `.ttf` / `.otf` из `src/assets/fonts` в `.woff` и `.woff2`.
+
+```bash
+yarn fonts:get "Roboto:300,400,500,700"
+```
+
+Загрузка нужных начертаний из Google Fonts и автоматическая конвертация в `.woff` и `.woff2`.
+
+```bash
 yarn deploy
 ```
 
 Загрузка содержимого `dist/` на сервер через FTP.
+
+## Шрифты
+
+В starter поддерживаются три обычных сценария работы со шрифтами.
+
+### Готовые WOFF / WOFF2
+
+Если шрифт уже подготовлен для web, просто скопировать его в:
+
+```text
+src/assets/fonts/<FontName>/
+```
+
+Например:
+
+```text
+src/assets/fonts/Mistral/
+├── Mistral.woff
+└── Mistral.woff2
+```
+
+Дополнительная обработка не требуется.
+
+### Есть TTF / OTF
+
+Если получен исходный `.ttf` или `.otf`, положить его в `src/assets/fonts`:
+
+```text
+src/assets/fonts/Mistral/Mistral.ttf
+```
+
+Затем выполнить:
+
+```bash
+yarn fonts:convert
+```
+
+Скрипт рекурсивно найдёт `.ttf` / `.otf` и создаст рядом:
+
+```text
+Mistral.woff
+Mistral.woff2
+```
+
+По умолчанию исходный `.ttf` / `.otf` удаляется после успешной генерации обеих web-версий.
+
+Чтобы сохранить исходник:
+
+```bash
+yarn fonts:convert --keep
+```
+
+Чтобы повторно пересобрать уже существующие `.woff` / `.woff2`:
+
+```bash
+yarn fonts:convert --force
+```
+
+Можно обработать только один конкретный файл:
+
+```bash
+yarn fonts:convert src/assets/fonts/Mistral/Mistral.ttf
+```
+
+### Google Fonts
+
+Для шрифтов из Google Fonts можно сразу скачать нужные начертания:
+
+```bash
+yarn fonts:get "Roboto:300,400,500,700"
+```
+
+Формат:
+
+```text
+Семейство:веса
+```
+
+Если веса не указаны, используется `400`:
+
+```bash
+yarn fonts:get "Yeseva One"
+```
+
+Для italic к весу добавляется `i`:
+
+```bash
+yarn fonts:get "Inter:400,600,700i"
+```
+
+Скрипт создаёт папку семейства в `src/assets/fonts`, скачивает статические версии шрифта и конвертирует их в `.woff` и `.woff2`.
+
+После подготовки файлы подключаются в `src/scss/settings/_fonts.scss` обычным способом через существующий миксин `font-face`.
 
 ## Структура проекта
 
@@ -457,6 +562,7 @@ BACKEND.md
 
 ```text
 COMPONENTS.md
+```
 
 ---
 

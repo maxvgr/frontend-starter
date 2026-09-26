@@ -75,6 +75,8 @@
     "dev": "webpack serve --mode=development --progress --open",
     "build": "webpack --mode=production --progress",
     "build_wp": "webpack --mode=production --progress && gulp styles && gulp scripts && gulp layout",
+    "fonts:convert": "node ./node_scripts/fonts-convert.js",
+    "fonts:get": "node ./node_scripts/fonts-get.js",
     "deploy": "node ./node_scripts/deploy.js"
   },
   "dependencies": {

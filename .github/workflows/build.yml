@@ -26,6 +26,8 @@ jobs:
 
       - name: Обновить зависимости
         run: yarn install
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       - name: Сохранить обновлённый yarn.lock
         uses: actions/upload-artifact@v4

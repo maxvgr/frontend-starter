@@ -2,8 +2,13 @@
 // В этом файле находятся всевозможные специфические стили
 // -----------------------------------------------------------------------------
 
-.scroll-lock {
+.is-scroll-locked {
   overflow: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 .collapsed:not(.collapsed_show) {

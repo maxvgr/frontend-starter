@@ -145,6 +145,7 @@ export class Modal {
     }
 
     modal.classList.add(this.options.activeClass);
+    modal.setAttribute('aria-hidden', 'false');
     this.openedModals.push(modal);
 
     if (this.options.catchFocus) {
@@ -215,6 +216,7 @@ export class Modal {
 
     this.options.onBeforeClose(modal);
     modal.classList.remove(this.options.activeClass);
+    modal.setAttribute('aria-hidden', 'true');
 
     if (this.options.catchFocus && modal.previousActiveElement?.focus) {
       modal.previousActiveElement.focus();
@@ -242,6 +244,7 @@ export class Modal {
     while (this.openedModals.length > 0) {
       const modal = this.openedModals.pop();
       modal.classList.remove(this.options.activeClass);
+      modal.setAttribute('aria-hidden', 'true');
 
       window.dispatchEvent(new CustomEvent('modalClosed', {
         detail: { modal }

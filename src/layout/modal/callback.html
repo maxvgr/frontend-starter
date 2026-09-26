@@ -1,10 +1,25 @@
-<div class="modal mw-callback" data-modal="callback">
+<div
+  class="modal mw-callback"
+  data-modal="callback"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-callback-title"
+  aria-hidden="true"
+>
   <div class="modal__overlay">
     <div class="modal__container">
       <div class="modal__wrapper">
         <div class="modal__header">
-          <p class="modal__title">Заголовок формы</p>
-          <div class="modal__close" data-modal-close></div>
+          <p class="modal__title" id="modal-callback-title">
+            Заголовок формы
+          </p>
+
+          <button
+            class="modal__close"
+            type="button"
+            data-modal-close
+            aria-label="Закрыть"
+          ></button>
         </div>
         <!-- /.modal__header -->
 
@@ -13,6 +28,7 @@
             <div class="form__wrapper">
               <div class="input" data-field>
                 <input
+                  id="callback-name"
                   class="input__field"
                   type="text"
                   name="user_name"
@@ -24,19 +40,20 @@
                   data-error-required="Укажите имя"
                   data-error-minlength="Имя должно содержать минимум 2 символа"
                 >
-                <span class="input__label">Имя</span>
+                <label class="input__label" for="callback-name">Имя</label>
               </div>
               <!-- /.input -->
 
               <div class="input input--box" data-field>
                 <textarea
+                  id="callback-message"
                   class="input__field"
                   name="user_message"
                   placeholder=""
                   minlength="5"
                   data-validate
                 ></textarea>
-                <span class="input__label">Комментарий</span>
+                <label class="input__label" for="callback-message">Комментарий</label>
               </div>
               <!-- /.input -->
             </div>

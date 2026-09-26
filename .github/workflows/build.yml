@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Проверка сборки
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Получить исходники
+        uses: actions/checkout@v4
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: yarn
+
+      - name: Включить Corepack
+        run: corepack enable
+
+      - name: Установить зависимости
+        run: yarn install --immutable
+
+      - name: Проверить обычную сборку
+        run: yarn build
+
+      - name: Проверить WordPress-сборку
+        run: yarn build:wp

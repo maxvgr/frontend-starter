@@ -24,8 +24,14 @@ jobs:
       - name: Включить Corepack
         run: corepack enable
 
-      - name: Установить зависимости
-        run: yarn install --immutable
+      - name: Обновить зависимости
+        run: yarn install
+
+      - name: Сохранить обновлённый yarn.lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-yarn-lock
+          path: yarn.lock
 
       - name: Проверить обычную сборку
         run: yarn build

@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -29,11 +29,18 @@ jobs:
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
-      - name: Сохранить обновлённый yarn.lock
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-yarn-lock
-          path: yarn.lock
+      - name: Зафиксировать yarn.lock
+        run: |
+          if git diff --quiet -- yarn.lock; then
+            echo "yarn.lock уже актуален"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add yarn.lock
+          git commit -m "chore: обновить yarn.lock"
+          git push
 
       - name: Проверить обычную сборку
         run: yarn build

@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+const dotenv = require("dotenv");
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlBeautifyPlugin = require("@nurminen/html-beautify-webpack-plugin");
@@ -16,6 +17,8 @@ const StylelintPlugin = require("stylelint-webpack-plugin");
 
 const ESLintPlugin = require("eslint-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+
+dotenv.config({ quiet: true });
 
 const cacheDir = path.resolve(__dirname, "node_modules", ".cache");
 if (!fs.existsSync(cacheDir)) {
@@ -43,8 +46,52 @@ const pages = fs
   .readdirSync(includeRoot)
   .filter((file) => file.endsWith(".html"));
 
+const wordPressThemeHeader = [
+  "/*",
+  `Theme Name: ${process.env.WP_THEME_NAME || "Theme"}`,
+  `Description: ${process.env.WP_THEME_DESCRIPTION || ""}`,
+  `Author: ${process.env.WP_THEME_AUTHOR || ""}`,
+  `Author URI: ${process.env.WP_THEME_AUTHOR_URI || ""}`,
+  `Version: ${process.env.WP_THEME_VERSION || "1.0.0"}`,
+  "*/",
+  "",
+  "",
+].join("\n");
+
+// Добавляет служебный заголовок WordPress в начало style.css
+class WordPressThemeHeaderPlugin {
+  apply(compiler) {
+    const { Compilation, sources } = compiler.webpack;
+
+    compiler.hooks.thisCompilation.tap(
+      "WordPressThemeHeaderPlugin",
+      (compilation) => {
+        compilation.hooks.processAssets.tap(
+          {
+            name: "WordPressThemeHeaderPlugin",
+            stage: Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE,
+          },
+          () => {
+            const asset = compilation.getAsset("style.css");
+
+            if (!asset) {
+              return;
+            }
+
+            compilation.updateAsset(
+              "style.css",
+              new sources.ConcatSource(wordPressThemeHeader, asset.source),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
 module.exports = (env, argv) => {
   const isProduction = argv.mode === "production";
+  const isWordPress = Boolean(env?.wp);
   const buildDateValue = new Intl.DateTimeFormat("ru-RU").format(new Date());
 
   return {
@@ -64,7 +111,7 @@ module.exports = (env, argv) => {
     devtool: isProduction ? false : "source-map",
 
     output: {
-      filename: "js/bundle.js",
+      filename: isWordPress ? "assets/js/bundle.js" : "js/bundle.js",
       path: path.resolve(__dirname, "dist"),
       clean: true,
       assetModuleFilename: (pathData) => {
@@ -229,10 +276,14 @@ module.exports = (env, argv) => {
         },
       }),
 
-      new MiniCssExtractPlugin({ filename: "css/[name].css" }),
+      new MiniCssExtractPlugin({
+        filename: isWordPress ? "style.css" : "css/[name].css",
+      }),
       new CopyWebpackPlugin({
         patterns: [{ from: "./src/assets", to: "assets/" }],
       }),
+
+      isWordPress && new WordPressThemeHeaderPlugin(),
 
       isProduction &&
         new FaviconsWebpackPlugin({

@@ -20,7 +20,6 @@
 ## 1. Стек
 
 - Webpack 5
-- Gulp 5
 - Yarn 4
 - PostHTML
 - Sass / SCSS

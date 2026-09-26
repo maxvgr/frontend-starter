@@ -103,10 +103,10 @@ yarn build
 Production-сборка.
 
 ```bash
-yarn build_wp
+yarn build:wp
 ```
 
-Production-сборка с дополнительной обработкой файлов для WordPress через Gulp.
+Production-сборка для WordPress через Webpack.
 
 ```bash
 yarn fonts:convert
@@ -223,7 +223,6 @@ yarn fonts:get "Inter:400,600,700i"
 
 ```text
 frontend-starter/
-├── gulp_tasks/
 ├── node_scripts/
 ├── src/
 │   ├── assets/
@@ -250,7 +249,6 @@ frontend-starter/
 │   └── page-home.html
 ├── AGENTS.md
 ├── BACKEND.md
-├── gulpfile.js
 ├── package.json
 └── webpack.config.js
 ```
@@ -476,10 +474,10 @@ FTP_SECURE=
 Для подготовки файлов под WordPress используется:
 
 ```bash
-yarn build_wp
+yarn build:wp
 ```
 
-Команда выполняет обычную production-сборку и дополнительные Gulp-задачи.
+Команда запускает Webpack в режиме WordPress: формирует `style.css`, переносит JS в `assets/js/` и добавляет заголовок темы из `.env`.
 
 Настройки WordPress-обработки могут потребовать адаптации под конкретный проект.
 

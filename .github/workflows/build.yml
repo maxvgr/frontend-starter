@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -15,6 +15,38 @@ jobs:
     steps:
       - name: Получить исходники
         uses: actions/checkout@v4
+
+      - name: Обновить документацию
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          readme = Path('README.md')
+          text = readme.read_text(encoding='utf-8')
+          text = text.replace('```bash\nyarn build_wp\n```\n\nProduction-сборка с дополнительной обработкой файлов для WordPress через Gulp.', '```bash\nyarn build:wp\n```\n\nProduction-сборка для WordPress через Webpack.')
+          text = text.replace('├── gulp_tasks/\n', '')
+          text = text.replace('├── gulpfile.js\n', '')
+          text = text.replace('```bash\nyarn build_wp\n```\n\nКоманда выполняет обычную production-сборку и дополнительные Gulp-задачи.', '```bash\nyarn build:wp\n```\n\nКоманда запускает Webpack в режиме WordPress: формирует `style.css`, переносит JS в `assets/js/` и добавляет заголовок темы из `.env`.')
+          readme.write_text(text, encoding='utf-8')
+
+          agents = Path('AGENTS.md')
+          text = agents.read_text(encoding='utf-8')
+          text = text.replace('- Gulp 5\n', '')
+          agents.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Зафиксировать документацию
+        run: |
+          if git diff --quiet -- README.md AGENTS.md; then
+            echo "Документация уже актуальна"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md AGENTS.md
+          git commit -m "docs: обновить документацию после удаления Gulp"
+          git push
 
       - name: Настроить Node.js
         uses: actions/setup-node@v4

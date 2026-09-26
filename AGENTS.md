@@ -576,7 +576,53 @@ yarn install
 
 ---
 
-## 28. Главное правило
+## 28. Шрифты
+
+Готовые `.woff` / `.woff2` можно просто копировать в `src/assets/fonts/<FontName>/` и подключать через `src/scss/settings/_fonts.scss`.
+
+Если есть локальный `.ttf` или `.otf`, использовать встроенный конвертер:
+
+```bash
+yarn fonts:convert
+```
+
+Команда рекурсивно обрабатывает файлы в `src/assets/fonts` и создаёт `.woff` и `.woff2`.
+
+Чтобы сохранить исходные `.ttf` / `.otf`:
+
+```bash
+yarn fonts:convert --keep
+```
+
+Чтобы пересобрать уже существующие web-шрифты:
+
+```bash
+yarn fonts:convert --force
+```
+
+Можно передать конкретный файл:
+
+```bash
+yarn fonts:convert src/assets/fonts/Mistral/Mistral.ttf
+```
+
+Для Google Fonts использовать:
+
+```bash
+yarn fonts:get "Roboto:300,400,500,700"
+```
+
+Если вес не указан, используется `400`. Для italic к весу добавляется `i`:
+
+```bash
+yarn fonts:get "Inter:400,600,700i"
+```
+
+Не использовать сторонние онлайн-конвертеры, если задача покрывается этими командами.
+
+---
+
+## 29. Главное правило
 
 Starter должен экономить время на следующем проекте.
 

@@ -20,28 +20,12 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 dotenv.config({ quiet: true });
 
-const cacheDir = path.resolve(__dirname, "node_modules", ".cache");
-if (!fs.existsSync(cacheDir)) {
-  fs.mkdirSync(cacheDir, { recursive: true });
-}
-
-const postHtmlCustomLoader = path.resolve(cacheDir, "posthtml-watch-loader.js");
-fs.writeFileSync(
-  postHtmlCustomLoader,
-  `
-  const path = require('path');
-  module.exports = function(content) {
-    const regex = /<include[^>]+src="([^"]+)"/gi;
-    let match;
-    while ((match = regex.exec(content)) !== null) {
-      this.addDependency(path.resolve(this.rootContext, 'src', match[1]));
-    }
-    return content;
-  };
-`,
-);
-
 const includeRoot = path.resolve(__dirname, "src");
+const postHtmlWatchLoader = path.resolve(
+  __dirname,
+  "node_scripts",
+  "posthtml-watch-loader.js",
+);
 const pages = fs
   .readdirSync(includeRoot)
   .filter((file) => file.endsWith(".html"));
@@ -173,7 +157,7 @@ module.exports = (env, argv) => {
               },
             },
             {
-              loader: postHtmlCustomLoader,
+              loader: postHtmlWatchLoader,
             },
           ],
         },
@@ -220,7 +204,7 @@ module.exports = (env, argv) => {
             {
               loader: "css-loader",
               options: {
-                sourceMap: true,
+                sourceMap: !isProduction,
                 importLoaders: 2,
                 modules: false,
               },

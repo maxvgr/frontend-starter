@@ -1,7 +1,7 @@
 const ftp = require('basic-ftp');
 const dotenv = require('dotenv');
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const secureValues = new Set(['true', '1', 'yes', 'on']);
 

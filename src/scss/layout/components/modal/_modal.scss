@@ -77,7 +77,10 @@
     right: 16px;
     width: 20px;
     height: 20px;
+    padding: 0;
+    border: 0;
 
+    background-color: transparent;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22' fill='none'%3E%3Cpath d='M1 1L21 21' stroke='%23333333' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M21 1L1 21' stroke='%23333333' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
     background-position: center;
     background-size: contain;

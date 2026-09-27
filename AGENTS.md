@@ -105,7 +105,7 @@ src/
 
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 
 <include src="layout/head.html"></include>
 

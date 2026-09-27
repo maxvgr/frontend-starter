@@ -241,7 +241,7 @@ frontend-starter/
 │   │   └── template/
 │   ├── scss/
 │   │   ├── abstracts/
-│   │   ├── base/
+│   │   ├── common/
 │   │   ├── layout/
 │   │   ├── settings/
 │   │   └── vendors/

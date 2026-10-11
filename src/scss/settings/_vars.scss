@@ -34,6 +34,17 @@ CSS-переменные. Во всех других случаях - SASS.
 $transition-time: 0.3s;
 $border-radius-round: 9999px;
 
+/* Толщина шрифта */
+$weight-Thin: 100;
+$weight-ExtraLight: 200;
+$weight-Light: 300;
+$weight-Regular: 400;
+$weight-Medium: 500;
+$weight-SemiBold: 600;
+$weight-Bold: 700;
+$weight-ExtraBold: 800;
+$weight-Black: 900;
+
 $palette-white: #ffffff;
 $palette-black: #000000;
 

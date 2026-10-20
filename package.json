@@ -50,7 +50,6 @@
     "posthtml": "^0.16.6",
     "posthtml-expressions": "^1.11.4",
     "posthtml-include": "^2.0.1",
-    "posthtml-inline-svg": "^0.2.0",
     "posthtml-loader": "^2.0.1",
     "sass": "^1.69.5",
     "sass-loader": "^13.3.2",

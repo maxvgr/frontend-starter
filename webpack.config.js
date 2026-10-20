@@ -5,7 +5,6 @@ const dotenv = require("dotenv");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlBeautifyPlugin = require("@nurminen/html-beautify-webpack-plugin");
 const postHtmlInclude = require("posthtml-include");
-const inlineSVG = require("posthtml-inline-svg");
 const expressions = require("posthtml-expressions");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -139,18 +138,6 @@ module.exports = (env, argv) => {
                     strictMode: false,
                     locals: {
                       buildDate: buildDateValue,
-                    },
-                  }),
-                  inlineSVG({
-                    cwd: includeRoot,
-                    tag: "inline",
-                    attr: "src",
-                    svgo: {
-                      plugins: [
-                        { removeXMLNS: true },
-                        { removeViewBox: false },
-                        { removeDimensions: false },
-                      ],
                     },
                   }),
                 ],

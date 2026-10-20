@@ -3,7 +3,7 @@ const fs = require("fs");
 const dotenv = require("dotenv");
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const HtmlBeautifyPlugin = require("@nurminen/html-beautify-webpack-plugin");
+const { html: beautifyHtml } = require("js-beautify");
 const postHtmlInclude = require("posthtml-include");
 const expressions = require("posthtml-expressions");
 
@@ -40,6 +40,25 @@ const wordPressThemeHeader = [
   "",
   "",
 ].join("\n");
+
+// Форматирует итоговый HTML перед записью в dist
+class HtmlBeautifyPlugin {
+  constructor(options = {}) {
+    this.options = options;
+  }
+
+  apply(compiler) {
+    compiler.hooks.compilation.tap("HtmlBeautifyPlugin", (compilation) => {
+      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tap(
+        "HtmlBeautifyPlugin",
+        (data) => {
+          data.html = beautifyHtml(data.html, this.options);
+          return data;
+        },
+      );
+    });
+  }
+}
 
 // Добавляет служебный заголовок WordPress в начало style.css
 class WordPressThemeHeaderPlugin {
@@ -236,15 +255,11 @@ module.exports = (env, argv) => {
       ),
 
       new HtmlBeautifyPlugin({
-        config: {
-          html: {
-            end_with_newline: true,
-            indent_size: 2,
-            indent_with_tabs: true,
-            indent_inner_html: true,
-            preserve_newlines: true,
-          },
-        },
+        end_with_newline: true,
+        indent_size: 2,
+        indent_with_tabs: true,
+        indent_inner_html: true,
+        preserve_newlines: true,
       }),
 
       new MiniCssExtractPlugin({

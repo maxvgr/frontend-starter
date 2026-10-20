@@ -30,7 +30,8 @@ jobs:
 
       - name: Обновить зависимости безопасности
         run: |
-          yarn add -D "basic-ftp@^6.2.3" "postcss@^8.5.31" "sharp@^0.35.5" "webpack-dev-server@^5.2.6"\n          yarn up -R source-map-js@1.2.2
+          yarn add -D -C basic-ftp@6.2.3 postcss@8.5.31 sharp@0.35.5 webpack-dev-server@5.2.6
+          yarn up -R source-map-js@1.2.2
 
       - name: Проверить обычную сборку
         run: yarn build

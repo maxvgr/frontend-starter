@@ -29,9 +29,25 @@ jobs:
         run: corepack enable
 
       - name: Обновить зависимости безопасности
+        shell: bash
         run: |
-          yarn add -D -C basic-ftp@6.2.3 postcss@8.5.31 sharp@0.35.5 webpack-dev-server@5.2.6
-          yarn up -R source-map-js
+          yarn add -D basic-ftp@6.2.3 favicons@7.3.1 postcss@8.5.31 sharp@0.35.5 webpack-dev-server@5.2.6
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'package.json';
+          const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const versions = {
+            'basic-ftp': '^6.2.3',
+            favicons: '^7.3.1',
+            postcss: '^8.5.31',
+            sharp: '^0.35.5',
+            'webpack-dev-server': '^5.2.6',
+          };
+          Object.assign(pkg.devDependencies, versions);
+          fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
+          NODE
+          yarn install
+          yarn up -R postcss sharp source-map-js
 
       - name: Проверить обычную сборку
         run: yarn build
@@ -51,6 +67,9 @@ jobs:
         run: |
           node node_scripts/deploy.js > /tmp/deploy.log 2>&1 && exit 1 || true
           grep -q "Не заполнены переменные окружения" /tmp/deploy.log
+
+      - name: Проверить high/critical уязвимости
+        run: yarn npm audit -A -R --severity high
 
       - name: Зафиксировать package.json и yarn.lock
         shell: bash

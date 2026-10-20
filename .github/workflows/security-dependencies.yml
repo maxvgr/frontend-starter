@@ -47,7 +47,7 @@ jobs:
           fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
           NODE
           yarn install --no-immutable
-          yarn up -R postcss sharp source-map-js @isaacs/brace-expansion brace-expansion braces browserslist fast-uri flatted glob http-cache-semantics immutable ip-address js-cookie js-yaml lodash minimatch nth-check picomatch proxy-addr serialize-javascript svgo tar websocket-driver
+          yarn up -R postcss sharp source-map-js @isaacs/brace-expansion brace-expansion braces browserslist fast-uri flatted glob http-cache-semantics immutable ip-address js-cookie js-yaml lodash minimatch nth-check picomatch proxy-addr serialize-javascript svgo tar terser-webpack-plugin websocket-driver
 
       - name: Проверить обычную сборку
         run: yarn build

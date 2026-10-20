@@ -1,0 +1,65 @@
+name: Security dependency update
+
+on:
+  push:
+    branches:
+      - security/dependencies-2026-10
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    name: Обновить и проверить зависимости
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Получить исходники
+        uses: actions/checkout@v4
+        with:
+          ref: security/dependencies-2026-10
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Включить Corepack
+        run: corepack enable
+
+      - name: Обновить зависимости безопасности
+        run: |
+          yarn up --caret basic-ftp@6.2.3 postcss@8.5.31 sharp@0.35.5 webpack-dev-server@5.2.6
+
+      - name: Проверить обычную сборку
+        run: yarn build
+
+      - name: Проверить WordPress-сборку
+        run: yarn build:wp
+
+      - name: Проверить запуск dev-server
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout 20s yarn webpack serve --mode=development --host 127.0.0.1 --no-open 2>&1 | tee /tmp/dev-server.log || test ${PIPESTATUS[0]} -eq 124
+          grep -Eq "compiled successfully|compiled with [0-9]+ warnings" /tmp/dev-server.log
+
+      - name: Проверить загрузку FTP-модуля
+        shell: bash
+        run: |
+          node node_scripts/deploy.js > /tmp/deploy.log 2>&1 && exit 1 || true
+          grep -q "Не заполнены переменные окружения" /tmp/deploy.log
+
+      - name: Зафиксировать package.json и yarn.lock
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json yarn.lock
+          if git diff --cached --quiet; then
+            echo "Изменений зависимостей нет"
+            exit 0
+          fi
+          git commit -m "chore: обновить зависимости безопасности"
+          git push

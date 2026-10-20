@@ -46,7 +46,7 @@ jobs:
           Object.assign(pkg.devDependencies, versions);
           fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
           NODE
-          yarn install
+          yarn install --no-immutable
           yarn up -R postcss sharp source-map-js
 
       - name: Проверить обычную сборку

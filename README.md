@@ -267,12 +267,6 @@ src/*.html
 <include src="layout/header.html"></include>
 ```
 
-Для inline SVG:
-
-```html
-<inline src="assets/images/icon.svg"></inline>
-```
-
 Повторяющиеся элементы и шаблоны рекомендуется выносить в:
 
 ```text

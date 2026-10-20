@@ -43,7 +43,7 @@ jobs:
         run: |
           set -o pipefail
           timeout 20s yarn webpack serve --mode=development --host 127.0.0.1 --no-open 2>&1 | tee /tmp/dev-server.log || test ${PIPESTATUS[0]} -eq 124
-          grep -Eq "compiled successfully|compiled with [0-9]+ warnings" /tmp/dev-server.log
+          grep -q "successfully" /tmp/dev-server.log
 
       - name: Проверить загрузку FTP-модуля
         shell: bash

@@ -246,7 +246,7 @@ frontend-starter/
 │   │   ├── settings/
 │   │   └── vendors/
 │   ├── index.html
-│   └── page-home.html
+│   └── cp-home.html
 ├── AGENTS.md
 ├── BACKEND.md
 ├── package.json
@@ -272,6 +272,31 @@ src/*.html
 ```text
 src/layout/
 ```
+
+### Именование страниц
+
+Для HTML-страниц используется единая схема:
+
+| Тип страницы | Имя файла | Корневой ID | SCSS |
+| --- | --- | --- | --- |
+| Обычная страница | `cp-{name}.html` | `cp-{name}` | `layout/pages/common/` |
+| Каталог / архив | `ap-{name}.html` | `ap-{name}` | `layout/pages/archive/` |
+| Карточка / одиночная запись | `sp-{name}.html` | `sp-{name}` | `layout/pages/single/` |
+| Служебная страница | `mp-{name}.html` | `mp-{name}` | `layout/pages/misc/` |
+
+`index.html` используется как служебная страница-навигатор по прототипу.
+
+Например, главная страница:
+
+```text
+src/cp-home.html
+#cp-home
+src/scss/layout/pages/common/home/
+```
+
+Имя файла без `.html` должно совпадать с корневым ID страницы. Уникальные ID внутри страницы строятся от него, например `cp-home-hero` или `sp-product-gallery`.
+
+Подробные правила переименования и связанных ID описаны в `AGENTS.md`.
 
 ## SCSS
 

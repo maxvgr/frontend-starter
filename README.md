@@ -358,6 +358,26 @@ src/scss/layout/pages/
 
 Не рекомендуется добавлять произвольные media queries, если нужный брейкпоинт уже существует в проекте.
 
+## SVG-иконки
+
+Для интерфейсных SVG-иконок используется общий sprite:
+
+```text
+src/assets/images/icons/package.svg
+```
+
+Повторяемые UI-иконки добавляются туда как `<symbol>` и подключаются через `<use>`:
+
+```html
+<svg class="button__icon" aria-hidden="true">
+  <use href="assets/images/icons/package.svg#arrow-right"></use>
+</svg>
+```
+
+Не дублировать одинаковые `<svg>` / `<path>` непосредственно в HTML страниц. Исключения — логотипы, крупные уникальные иллюстрации и другая SVG-графика, которую технически нецелесообразно помещать в sprite.
+
+Подробные правила находятся в `AGENTS.md`.
+
 ## JavaScript
 
 Основной JS находится в:
